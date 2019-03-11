@@ -1,0 +1,6 @@
+name: HMP Elastic
+description: HMP Elastic Search Connector Module
+package: HMP Custom
+type: module
+core: 8.x
+version: 8.1.0

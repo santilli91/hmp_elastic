@@ -1,0 +1,6 @@
+hmp_elastic.config_form:
+  title: 'HMP Elasticsearch Configuration'
+  description: 'Configuration Options for the HMP Elastic Module.'
+  parent: system.admin_config_system
+  route_name: hmp_elastic.config_form
+  weight: 100

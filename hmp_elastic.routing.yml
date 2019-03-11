@@ -1,0 +1,7 @@
+hmp_elastic.config_form:
+  path: '/admin/config/hmp_elastic'
+  defaults:
+    _form: '\Drupal\hmp_elastic\Form\ConfigForm'
+    _title: 'HMP Elasticsearch Configuration'
+  requirements:
+    _permission: 'administer nodes'
