@@ -15,6 +15,7 @@ jQuery(function($) {
 		  url: path,
 		})
 		  .done(function( results ) {
+		  	console.log(results);
 		  	data = JSON.parse(results);
 		  	data = data[0];
 			console.log(data);

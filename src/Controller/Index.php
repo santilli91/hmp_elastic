@@ -83,15 +83,59 @@ class Index extends ControllerBase {
 				}
 			}
 
-			$nodes[$result->nid] = array(	
-				'title' => $result->title,
-				'created' => $result->created,
-				'url' => 'https://' . $_SERVER['HTTP_HOST'] . \Drupal::service('path.alias_manager')->getAliasByPath('/node/'.$result->nid),
-				'summary' => '',
-				'body' => $terms,
+			$nodes[] = array(
+				array(
+					'index' => array(
+						'_index' => $hmp_elastic['elastic_index'],
+						'_id' => $_SERVER['HTTP_HOST'] . ':' . $result->nid,
+					)
+				),
+				array(
+					'title' => $result->title,
+					'created' => $result->created,
+					'url' => 'https://' . $_SERVER['HTTP_HOST'] . \Drupal::service('path.alias_manager')->getAliasByPath('/node/'.$result->nid),
+					'summary' => '',
+					'body' => $terms,
+				)
 			);
 		}
+		$this->sendIndex($hmp_elastic,$nodes);
 		return $nodes;
+	}
+
+	/*
+	 * Index the content to Elasticsearch
+	 */
+	function sendIndex($hmp_elastic,$nodes) {
+		$url = $hmp_elastic['elastic_server'];
+		$username = $hmp_elastic['elastic_username'];
+		$password = $hmp_elastic['elastic_password'];
+
+		$index = $hmp_elastic['elastic_index'];
+		$doc_type = 'default';
+		$port = 443;
+		$items = array();
+		foreach($nodes as $node) {
+			foreach($node as $line) {
+				$items[] = json_encode($line);
+			}
+		}
+		$json_doc = join("\n", $items) . "\n";
+
+	    $baseUri = $url.'/'.$index.'/'.$doc_type.'/_bulk';
+
+	    $ci = curl_init();
+	    curl_setopt($ci, CURLOPT_URL, $baseUri);
+	    curl_setopt($ci, CURLOPT_PORT, $port);
+	    curl_setopt($ci, CURLOPT_TIMEOUT, 200);
+	    curl_setopt($ci, CURLOPT_RETURNTRANSFER, 1);
+	    curl_setopt($ci, CURLOPT_FORBID_REUSE, 0);
+	    curl_setopt($ci, CURLOPT_CUSTOMREQUEST, 'POST');
+	    curl_setopt($ci, CURLOPT_POSTFIELDS, $json_doc);
+	    curl_setopt($ci, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+	    curl_setopt($ci, CURLOPT_USERPWD, $username . ":" . $password);
+	    $response = curl_exec($ci);
+	    print_r($response);
 	}
 }
 ?>
