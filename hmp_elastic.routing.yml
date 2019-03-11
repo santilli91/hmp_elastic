@@ -5,3 +5,19 @@ hmp_elastic.config_form:
     _title: 'HMP Elasticsearch Configuration'
   requirements:
     _permission: 'administer nodes'
+
+hmp_elastic.index_page:
+  path: '/admin/config/hmp_elastic/index'
+  defaults:
+    _controller: '\Drupal\hmp_elastic\Controller\Index::indexPage'
+    _title: 'Index Content'
+  requirements:
+    _permission: 'administer content'
+
+hmp_elastic.index:
+  path: '/admin/config/hmp_elastic/index/{offset}/{qty}'
+  defaults:
+    _controller: '\Drupal\hmp_elastic\Controller\Index::index'
+    _title: 'Index Content'
+  requirements:
+    _permission: 'administer content'
