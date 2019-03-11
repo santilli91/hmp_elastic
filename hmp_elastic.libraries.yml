@@ -1,0 +1,8 @@
+elastic:
+  version: 1.x
+  css:
+  js:
+    js/elastic.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
