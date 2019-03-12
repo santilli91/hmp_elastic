@@ -50,6 +50,11 @@ class ConfigForm extends FormBase {
 			'#default_value' => $hmp_elastic['elastic_node'],
 			'#title' => 'ElasticSearch node reference (field_machine_name) (comma separated): ',
 		);
+		$form['elastic_body'] = array(
+			'#type' => 'textarea',
+			'#default_value' => $hmp_elastic['elastic_body'],
+			'#title' => 'ElasticSearch body field machine name (if nested in paragraph, separate with pipe: paragraph|field) ',
+		);
 
 		/** Submit Button **/
 		$form['break'] = array(
@@ -76,7 +81,8 @@ class ConfigForm extends FormBase {
 			'elastic_password'				=>	$form_state->getValue('elastic_password'),
 			'elastic_content_type'				=>	$form_state->getValue('elastic_content_type'),
 			'elastic_term'				=>	$form_state->getValue('elastic_term'),
-			'elastic_node'				=>	$form_state->getValue('elastic_node')
+			'elastic_node'				=>	$form_state->getValue('elastic_node'),
+			'elastic_body'				=>	$form_state->getValue('elastic_body')
 		);
 		\Drupal::state()->set('hmp_elastic',$hmp_elastic);
 	}

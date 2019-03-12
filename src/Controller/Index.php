@@ -82,7 +82,36 @@ class Index extends ControllerBase {
 					}
 				}
 			}
-
+			$fields = explode(',',$hmp_elastic['elastic_body']);
+			$body = '';
+			foreach($fields as $field) {
+				if(strpos($field,'|')) {
+					$p = explode('|',$field);
+					$pField = $p[0];
+					$bField = $p[1];
+					if($node->hasField("$pField")) {
+						$paragraphs = $node->get("$pField")->getValue();
+						foreach($paragraphs as $item) {
+							$paragraph = \Drupal\paragraphs\Entity\Paragraph::load( $item['target_id'] );
+							if($paragraph->hasField("$bField")) {
+								$contents = $paragraph->get("$bField")->getValue();
+								foreach($contents as $content) {
+									$body .= $content['value'];
+								}
+							}
+						}
+					}
+				}
+				else if($field != '' && $node->hasField("$field")) {
+					$contents = $node->get("$field")->getValue();
+					foreach($contents as $content) {
+						$body .= $content['value'];
+					}
+				}
+			}
+			$body = strip_tags($body);
+			$sum = explode('.',$body);
+			$summary = implode('.',array($sum[0],$sum[1],$sum[2]));
 			$nodes[] = array(
 				array(
 					'index' => array(
@@ -94,8 +123,8 @@ class Index extends ControllerBase {
 					'title' => $result->title,
 					'created' => $result->created,
 					'url' => 'https://' . $_SERVER['HTTP_HOST'] . \Drupal::service('path.alias_manager')->getAliasByPath('/node/'.$result->nid),
-					'summary' => '',
-					'body' => $terms,
+					'summary' => $summary,
+					'body' => $body . '\n' . $terms,
 				)
 			);
 		}
@@ -135,7 +164,6 @@ class Index extends ControllerBase {
 	    curl_setopt($ci, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 	    curl_setopt($ci, CURLOPT_USERPWD, $username . ":" . $password);
 	    $response = curl_exec($ci);
-	    print_r($response);
 	}
 }
 ?>
