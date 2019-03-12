@@ -1,7 +1,11 @@
 jQuery(function($) {
 	console.log('test');
 	$('#index-start').click(function() {
-		hmp_index(0,50,0);
+		$.ajax({
+			url: '/admin/config/hmp_elastic/index/delete',
+		}).done(function(results) {
+			hmp_index(0,50,0);
+		});
 	});
 
 	function hmp_index(offset = 0,qty = 50,max = 0) {
@@ -15,7 +19,7 @@ jQuery(function($) {
 		  url: path,
 		})
 		  .done(function( results ) {
-		  	console.log(results);
+		  	//console.log(results);
 		  	data = JSON.parse(results);
 		  	data = data[0];
 			console.log(data);

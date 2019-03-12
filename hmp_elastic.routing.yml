@@ -14,6 +14,14 @@ hmp_elastic.index_page:
   requirements:
     _permission: 'administer content'
 
+hmp_elastic.index_delete:
+  path: '/admin/config/hmp_elastic/index/delete'
+  defaults:
+    _controller: '\Drupal\hmp_elastic\Controller\Index::deleteIndexedNodes'
+    _title: 'Index Content'
+  requirements:
+    _permission: 'administer content'
+
 hmp_elastic.index:
   path: '/admin/config/hmp_elastic/index/{offset}/{qty}'
   defaults:
@@ -21,3 +29,11 @@ hmp_elastic.index:
     _title: 'Index Content'
   requirements:
     _permission: 'administer content'
+
+hmp_elastic.search_page:
+  path: '/network-search'
+  defaults:
+    _controller: '\Drupal\hmp_elastic\Controller\SearchPage::searchPage'
+    _title: 'Search Page'
+  requirements:
+    _permission: 'view content'

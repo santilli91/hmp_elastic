@@ -12,7 +12,7 @@ function hmp_elastic_page_attachments(array &$attachments) {
 function hmp_elastic_node_update($node) {
 	hmp_elastic_indexOnSave($node);
 }
-function hmp_elastic_node_presave($node) {
+function hmp_elastic_node_insert($node) {
 	hmp_elastic_indexOnSave($node);
 }
 
@@ -20,5 +20,11 @@ function hmp_elastic_indexOnSave($node) {
 	$index = new Index();
 	$nodes[] = $index->getFields($node);
 	$index->sendIndex($nodes);
+}
+
+
+function hmp_elastic_node_predelete($node) {
+	$index = new Index();
+	$index->deleteIndexedNode($node->id());
 }
 ?>

@@ -74,7 +74,6 @@ class Index extends ControllerBase {
 			$node = Node::load($result->nid);
 			$nodes[] = $this->getFields($node);
 		}
-
 		$this->sendIndex($nodes);
 		return $nodes;
 	}
@@ -173,6 +172,76 @@ class Index extends ControllerBase {
 		$json_doc = join("\n", $items) . "\n";
 
 	    $baseUri = $url.'/'.$index.'/'.$doc_type.'/_bulk';
+
+	    $ci = curl_init();
+	    curl_setopt($ci, CURLOPT_URL, $baseUri);
+	    curl_setopt($ci, CURLOPT_PORT, $port);
+	    curl_setopt($ci, CURLOPT_TIMEOUT, 200);
+	    curl_setopt($ci, CURLOPT_RETURNTRANSFER, 1);
+	    curl_setopt($ci, CURLOPT_FORBID_REUSE, 0);
+	    curl_setopt($ci, CURLOPT_CUSTOMREQUEST, 'POST');
+	    curl_setopt($ci, CURLOPT_POSTFIELDS, $json_doc);
+	    curl_setopt($ci, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+	    curl_setopt($ci, CURLOPT_USERPWD, $username . ":" . $password);
+	    $response = curl_exec($ci);
+	}
+	/*
+	 * Index the content to Elasticsearch
+	 */
+	public function deleteIndexedNodes() {
+		$hmp_elastic = \Drupal::state()->get('hmp_elastic');
+		$url = $hmp_elastic['elastic_server'];
+		$username = $hmp_elastic['elastic_username'];
+		$password = $hmp_elastic['elastic_password'];
+
+		$index = $hmp_elastic['elastic_index'];
+		$doc_type = 'default';
+		$port = 443;
+		$json_doc = json_encode(array(
+			'query' => array(
+				'match' => array(
+					'domain' => $_SERVER['HTTP_HOST']
+				)
+			)
+		));
+
+	    $baseUri = $url.'/'.$index.'/'.$doc_type.'/_delete_by_query';
+
+	    $ci = curl_init();
+	    curl_setopt($ci, CURLOPT_URL, $baseUri);
+	    curl_setopt($ci, CURLOPT_PORT, $port);
+	    curl_setopt($ci, CURLOPT_TIMEOUT, 200);
+	    curl_setopt($ci, CURLOPT_RETURNTRANSFER, 1);
+	    curl_setopt($ci, CURLOPT_FORBID_REUSE, 0);
+	    curl_setopt($ci, CURLOPT_CUSTOMREQUEST, 'POST');
+	    curl_setopt($ci, CURLOPT_POSTFIELDS, $json_doc);
+	    curl_setopt($ci, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+	    curl_setopt($ci, CURLOPT_USERPWD, $username . ":" . $password);
+	    $response = curl_exec($ci);
+	    echo 'complete';exit;
+	}
+
+	/*
+	 * Index the content to Elasticsearch
+	 */
+	public function deleteIndexedNode($nid) {
+		$hmp_elastic = \Drupal::state()->get('hmp_elastic');
+		$url = $hmp_elastic['elastic_server'];
+		$username = $hmp_elastic['elastic_username'];
+		$password = $hmp_elastic['elastic_password'];
+
+		$index = $hmp_elastic['elastic_index'];
+		$doc_type = 'default';
+		$port = 443;
+		$json_doc = json_encode(array(
+			'query' => array(
+				'match' => array(
+					'_id' => $_SERVER['HTTP_HOST'].':'.$nid
+				)
+			)
+		));
+
+	    $baseUri = $url.'/'.$index.'/'.$doc_type.'/_delete_by_query';
 
 	    $ci = curl_init();
 	    curl_setopt($ci, CURLOPT_URL, $baseUri);
