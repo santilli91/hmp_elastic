@@ -1,8 +1,24 @@
 <?php
+
+use \Drupal\hmp_elastic\Controller\Index;
+
 function hmp_elastic_page_attachments(array &$attachments) {
 	$current_path = \Drupal::request()->getRequestUri();
 	$current_path = explode('?',$current_path);
 	if(strpos($current_path[0],'/admin/config/hmp_elastic/index') !== false)
   		$attachments['#attached']['library'][] = 'hmp_elastic/elastic';
+}
+
+function hmp_elastic_node_update($node) {
+	hmp_elastic_indexOnSave($node);
+}
+function hmp_elastic_node_presave($node) {
+	hmp_elastic_indexOnSave($node);
+}
+
+function hmp_elastic_indexOnSave($node) {
+	$index = new Index();
+	$nodes[] = $index->getFields($node);
+	$index->sendIndex($nodes);
 }
 ?>

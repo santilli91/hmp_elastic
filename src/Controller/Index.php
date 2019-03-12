@@ -54,6 +54,7 @@ class Index extends ControllerBase {
 		$query = \Drupal::database()->select('node_field_data','n');
 		$query->fields('n',['title','nid','created']);
 		$query->condition('n.type',$types,'IN');
+		$query->condition('n.status',1,'=');
 		return $query;
 	}
 
@@ -64,78 +65,98 @@ class Index extends ControllerBase {
 	}
 
 	public function getData($query,$offset,$qty) {
-		$hmp_elastic = \Drupal::state()->get('hmp_elastic');
 		$query->range($offset,$qty);
 		$results = $query->execute();
 		$nodes = array();
+
+		//Iterate nodes
 		foreach($results as $result) {
 			$node = Node::load($result->nid);
-			$fields = explode(',',$hmp_elastic['elastic_term']);
-			$terms = $_SERVER['HTTP_HOST'];
-			foreach($fields as $field) {
-				if($field != '' && $node->hasField("$field")) {
-					$items = $node->get("$field")->getValue();
-					foreach($items as $item) {
-						$term = Term::load($item['target_id']);
-						if($term) 
-							$terms .= ',' . $term->getName();
-					}
+			$nodes[] = $this->getFields($node);
+		}
+
+		$this->sendIndex($nodes);
+		return $nodes;
+	}
+
+	public function getFields($node) {
+		/** Iterate through fields based on machine names for taxonomy **/
+		$hmp_elastic = \Drupal::state()->get('hmp_elastic');
+		$fields = explode(',',$hmp_elastic['elastic_term']);
+		$terms = $_SERVER['HTTP_HOST'];
+		foreach($fields as $field) {
+			if($field != '' && $node->hasField("$field")) {
+				$items = $node->get("$field")->getValue();
+				foreach($items as $item) {
+					$term = Term::load($item['target_id']);
+					if($term) 
+						$terms .= ',' . $term->getName();
 				}
 			}
-			$fields = explode(',',$hmp_elastic['elastic_body']);
-			$body = '';
-			foreach($fields as $field) {
-				if(strpos($field,'|')) {
-					$p = explode('|',$field);
-					$pField = $p[0];
-					$bField = $p[1];
-					if($node->hasField("$pField")) {
-						$paragraphs = $node->get("$pField")->getValue();
-						foreach($paragraphs as $item) {
-							$paragraph = \Drupal\paragraphs\Entity\Paragraph::load( $item['target_id'] );
-							if($paragraph->hasField("$bField")) {
-								$contents = $paragraph->get("$bField")->getValue();
-								foreach($contents as $content) {
-									$body .= $content['value'];
-								}
+		}
+
+		/** Iterate through fields based on machine name for the body content, should be text fields only **/
+		$fields = explode(',',$hmp_elastic['elastic_body']);
+		$body = '';
+		foreach($fields as $field) {
+
+			//In the instance of a paragraph, iterate through paragraph, the paragraphs fields
+			if(strpos($field,'|')) {
+				$p = explode('|',$field);
+				$pField = $p[0];
+				$bField = $p[1];
+				if($node->hasField("$pField")) {
+					$paragraphs = $node->get("$pField")->getValue();
+					foreach($paragraphs as $item) {
+						$paragraph = \Drupal\paragraphs\Entity\Paragraph::load( $item['target_id'] );
+						if($paragraph->hasField("$bField")) {
+							$contents = $paragraph->get("$bField")->getValue();
+							foreach($contents as $content) {
+								$body .= $content['value'];
 							}
 						}
 					}
 				}
-				else if($field != '' && $node->hasField("$field")) {
-					$contents = $node->get("$field")->getValue();
-					foreach($contents as $content) {
-						$body .= $content['value'];
-					}
+			}
+			else if($field != '' && $node->hasField("$field")) {
+				$contents = $node->get("$field")->getValue();
+				foreach($contents as $content) {
+					$body .= $content['value'];
 				}
 			}
-			$body = strip_tags($body);
-			$sum = explode('.',$body);
-			$summary = implode('.',array($sum[0],$sum[1],$sum[2]));
-			$nodes[] = array(
-				array(
-					'index' => array(
-						'_index' => $hmp_elastic['elastic_index'],
-						'_id' => $_SERVER['HTTP_HOST'] . ':' . $result->nid,
-					)
-				),
-				array(
-					'title' => $result->title,
-					'created' => $result->created,
-					'url' => 'https://' . $_SERVER['HTTP_HOST'] . \Drupal::service('path.alias_manager')->getAliasByPath('/node/'.$result->nid),
-					'summary' => $summary,
-					'body' => $body . '\n' . $terms,
-				)
-			);
 		}
-		$this->sendIndex($hmp_elastic,$nodes);
-		return $nodes;
+
+		//Strip tags, build summary
+		$body = strip_tags($body);
+		$sum = explode('.',$body);
+		$summary = implode('.',array($sum[0],$sum[1],$sum[2]));
+
+		/**  Generate the array for each node before sending to json and elastic **/
+		return array(
+			array(
+				'index' => array(
+					'_index' => $hmp_elastic['elastic_index'],
+					'_id' => $_SERVER['HTTP_HOST'] . ':' . $node->id(),
+				)
+			),
+			array(
+				'title' => $node->getTitle(),
+				'created' => $node->created->value,
+				'url' => 'https://' . $_SERVER['HTTP_HOST'] . \Drupal::service('path.alias_manager')->getAliasByPath('/node/'.$node->id()),
+				'summary' => $summary,
+				'body' => $body . '\n' . $terms,
+				'domain' => $_SERVER['HTTP_HOST'],
+				'status' => $node->status->value
+			)
+		);
+
 	}
 
 	/*
 	 * Index the content to Elasticsearch
 	 */
-	function sendIndex($hmp_elastic,$nodes) {
+	public function sendIndex($nodes) {
+		$hmp_elastic = \Drupal::state()->get('hmp_elastic');
 		$url = $hmp_elastic['elastic_server'];
 		$username = $hmp_elastic['elastic_username'];
 		$password = $hmp_elastic['elastic_password'];
