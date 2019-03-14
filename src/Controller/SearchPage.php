@@ -81,9 +81,21 @@ class SearchPage extends ControllerBase {
 			'query' => array(
 				'function_score' => array(
 					'query' => array(
-						'multi_match' => array(	
-							'query' => $query,
-							'fields' => ['title','body']
+						'bool' => array(
+							'must' => array(
+								array(
+									'multi_match' => array(	
+										'query' => $query,
+										'fields' => ['title','body','terms'],
+										'operator' => 'and'
+									)
+								),
+								array(
+									'match' => array(
+										'status' => '1'
+									)
+								)
+							)
 						)
 					),
 					'functions' => array(
@@ -91,7 +103,7 @@ class SearchPage extends ControllerBase {
 							'filter' => array(
 								'range' => array(
 									'created' => array(
-										'gte' => 'now-1y',
+										'gte' => 'now-4y',
 										'lte' => 'now'
 									)
 								)
@@ -101,21 +113,21 @@ class SearchPage extends ControllerBase {
 							'filter' => array(
 								'range' => array(
 									'created' => array(
-										'gte' => 'now-2y',
-										'lte' => 'now-1y'
+										'gte' => 'now-5y',
+										'lte' => 'now-4y'
 									)
 								)
-							),'weight' => 10
+							),'weight' => 14
 						),
 						array(
 							'filter' => array(
 								'range' => array(
 									'created' => array(
-										'gte' => 'now-3y',
-										'lte' => 'now-2y'
+										'gte' => 'now-7y',
+										'lte' => 'now-5y'
 									)
 								)
-							),'weight' => 6
+							),'weight' => 7
 						)
 				))
 			)
@@ -136,7 +148,7 @@ class SearchPage extends ControllerBase {
 	    curl_setopt($ci, CURLOPT_USERPWD, $username . ":" . $password);
 	    $response = curl_exec($ci);
 	    $data = json_decode($response);
-	   // echo '<pre>';print_r($data);exit;
+	 //  echo '<pre>';print_r($data);exit;
 	    return $data->hits;
 	}
 }

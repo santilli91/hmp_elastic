@@ -54,7 +54,6 @@ class Index extends ControllerBase {
 		$query = \Drupal::database()->select('node_field_data','n');
 		$query->fields('n',['title','nid','created']);
 		$query->condition('n.type',$types,'IN');
-		$query->condition('n.status',1,'=');
 		return $query;
 	}
 
@@ -89,7 +88,7 @@ class Index extends ControllerBase {
 				foreach($items as $item) {
 					$term = Term::load($item['target_id']);
 					if($term) 
-						$terms .= ' , ' . $term->getName();
+						$terms .= ' ' . $term->getName();
 				}
 			}
 		}
@@ -150,7 +149,8 @@ class Index extends ControllerBase {
 				'body' => $body . ' ' . $terms,
 				'domain' => $_SERVER['HTTP_HOST'],
 				'site_name' => $site_name,
-				'status' => $node->status->value
+				'status' => $node->status->value,
+				'terms' => $terms
 			)
 		);
 
