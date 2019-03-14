@@ -95,6 +95,16 @@ class SearchPage extends ControllerBase {
 										'status' => '1'
 									)
 								)
+							),
+							'should' => array(
+								array(
+									'match' => array(
+										'terms' => array(
+											'query' => 'article',
+											'boost' => 5
+										)
+									)
+								)
 							)
 						)
 					),
@@ -148,7 +158,7 @@ class SearchPage extends ControllerBase {
 	    curl_setopt($ci, CURLOPT_USERPWD, $username . ":" . $password);
 	    $response = curl_exec($ci);
 	    $data = json_decode($response);
-	 //  echo '<pre>';print_r($data);exit;
+	   echo '<pre>';print_r($data);exit;
 	    return $data->hits;
 	}
 }
