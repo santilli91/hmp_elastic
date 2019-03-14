@@ -43,7 +43,7 @@ class SearchPage extends ControllerBase {
 		foreach($items as $item) {
 			$content .= '<li class="row seach-results">';
 			$content .= '<div class="search-results-title"><a href="' . $item->_source->url . '">' . $item->_source->title . '</a></div>';
-			$content .= '<div class="search-results-site"><a href="http://' . $item->_source->domain . '">' . $item->_source->domain . '</a></div>';
+			$content .= '<div class="search-results-site"><a href="http://' . $item->_source->domain . '">' . $item->_source->site_name . '</a></div>';
 			$content .= '<div class="search-results-summary">' . $item->_source->summary . '</div>';
 			$content .= '</li>';
 			$count++;
@@ -79,12 +79,28 @@ class SearchPage extends ControllerBase {
 			'from' => $page,
 			'size' => 15,
 			'query' => array(
-				'match' => array(
-					'body' => $query
-				)
+				'function_score' => array(
+					'query' => array(
+						'multi_match' => array(	
+							'query' => $query,
+							'fields' => ['title','body']
+						)
+					),
+					'functions' => array(array(
+						'filter' => array(
+							'range' => array(
+								'created' => array(
+									'gte' => 'now-1m',
+									'lte' => 'now'
+								)
+							)
+						),'weight' => 150
+					)
+				))
 			)
 		));
 
+	//	echo $json_doc;exit;
 	    $baseUri = $url.'/'.$index.'/'.$doc_type.'/_search';
 
 	    $ci = curl_init();

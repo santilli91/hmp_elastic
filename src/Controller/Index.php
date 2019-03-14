@@ -144,7 +144,7 @@ class Index extends ControllerBase {
 			),
 			array(
 				'title' => $node->getTitle(),
-				'created' => $node->created->value,
+				'created' => date('Y/m/d',$node->created->value),
 				'url' => 'https://' . $_SERVER['HTTP_HOST'] . \Drupal::service('path.alias_manager')->getAliasByPath('/node/'.$node->id()),
 				'summary' => $summary,
 				'body' => $body . ' ' . $terms,
