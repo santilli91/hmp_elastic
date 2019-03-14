@@ -144,7 +144,7 @@ class Index extends ControllerBase {
 			),
 			array(
 				'title' => $node->getTitle(),
-				'created' => date('Y/m/d',$node->created->value),
+				'created' => date('Y-m-d',$node->created->value),
 				'url' => 'https://' . $_SERVER['HTTP_HOST'] . \Drupal::service('path.alias_manager')->getAliasByPath('/node/'.$node->id()),
 				'summary' => $summary,
 				'body' => $body . ' ' . $terms,
@@ -189,6 +189,7 @@ class Index extends ControllerBase {
 	    curl_setopt($ci, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 	    curl_setopt($ci, CURLOPT_USERPWD, $username . ":" . $password);
 	    $response = curl_exec($ci);
+	   // echo '<pre>';print_r(json_decode($response));exit;
 	}
 	/*
 	 * Index the content to Elasticsearch
