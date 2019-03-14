@@ -89,7 +89,7 @@ class Index extends ControllerBase {
 				foreach($items as $item) {
 					$term = Term::load($item['target_id']);
 					if($term) 
-						$terms .= ',' . $term->getName();
+						$terms .= ' , ' . $term->getName();
 				}
 			}
 		}
@@ -130,6 +130,10 @@ class Index extends ControllerBase {
 		$sum = explode('.',$body);
 		$summary = implode('.',array($sum[0],$sum[1],$sum[2]));
 
+
+		//Get the site name
+		$config = \Drupal::config('system.site');
+  		$site_name = $config->get('name');
 		/**  Generate the array for each node before sending to json and elastic **/
 		return array(
 			array(
@@ -143,8 +147,9 @@ class Index extends ControllerBase {
 				'created' => $node->created->value,
 				'url' => 'https://' . $_SERVER['HTTP_HOST'] . \Drupal::service('path.alias_manager')->getAliasByPath('/node/'.$node->id()),
 				'summary' => $summary,
-				'body' => $body . '\n' . $terms,
+				'body' => $body . ' ' . $terms,
 				'domain' => $_SERVER['HTTP_HOST'],
+				'site_name' => $site_name,
 				'status' => $node->status->value
 			)
 		);

@@ -36,4 +36,12 @@ hmp_elastic.search_page:
     _controller: '\Drupal\hmp_elastic\Controller\SearchPage::searchPage'
     _title: 'Search Page'
   requirements:
-    _permission: 'view content'
+    _access: 'TRUE'
+
+hmp_elastic.search_query:
+  path: '/hmp-elastic/search/query'
+  defaults:
+    _controller: '\Drupal\hmp_elastic\Controller\SearchPage::searchResults'
+    _title: 'Search Page'
+  requirements:
+    _access: 'TRUE'

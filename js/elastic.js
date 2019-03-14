@@ -1,4 +1,5 @@
 jQuery(function($) {
+	var page = 0;
 	console.log('test');
 	$('#index-start').click(function() {
 		$.ajax({
@@ -7,6 +8,39 @@ jQuery(function($) {
 			hmp_index(0,50,0);
 		});
 	});
+
+	$('#elastic-search-terms').keydown(function(e) {
+		if (e.keyCode == 13) {
+			e.preventDefault();
+			page=0;
+			performSearch();
+		}
+	});
+	$('#elastic-search-submit').click(function(e) {
+		e.preventDefault();
+		page=0;
+		performSearch();
+	});
+	$(document).on('click','#elastic-pager-previous',function() {
+		page--;
+		performSearch();
+	});
+	$(document).on('click','#elastic-pager-next',function() {
+		page++;
+		performSearch();
+	});
+
+
+	function performSearch() {
+		var query = $('#elastic-search-terms').val();
+		console.log(query);
+		$.ajax({
+			url: "/hmp-elastic/search/query?page=" + page + "&query=" + query,
+		})
+		.done(function(results) {
+			$('#elastic-search-results').html(results);
+		});
+	}
 
 	function hmp_index(offset = 0,qty = 50,max = 0) {
 
