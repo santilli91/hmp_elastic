@@ -86,16 +86,37 @@ class SearchPage extends ControllerBase {
 							'fields' => ['title','body']
 						)
 					),
-					'functions' => array(array(
-						'filter' => array(
-							'range' => array(
-								'created' => array(
-									'gte' => 'now-1m',
-									'lte' => 'now'
+					'functions' => array(
+						array(
+							'filter' => array(
+								'range' => array(
+									'created' => array(
+										'gte' => 'now-1y',
+										'lte' => 'now'
+									)
 								)
-							)
-						),'weight' => 150
-					)
+							),'weight' => 15
+						),
+						array(
+							'filter' => array(
+								'range' => array(
+									'created' => array(
+										'gte' => 'now-2y',
+										'lte' => 'now-1y'
+									)
+								)
+							),'weight' => 10
+						),
+						array(
+							'filter' => array(
+								'range' => array(
+									'created' => array(
+										'gte' => 'now-3y',
+										'lte' => 'now-2y'
+									)
+								)
+							),'weight' => 6
+						)
 				))
 			)
 		));
