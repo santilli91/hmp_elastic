@@ -1,0 +1,42 @@
+Elastic Search Module for HMP journal websites
+03/14/2019
+
+
+
+
+
+Elasticsearch Data Format:
+
+PUT wound_care_learning_network
+{
+  "mappings": {
+    "default": {
+      "properties": {
+        "created": {
+          "type": "date" 
+        },
+        "title" : {
+          "type" : "text"
+        },
+        "url" : {
+          "type" : "text"
+        },
+        "summary" : {
+          "type" : "text"
+        },
+        "body" : {
+          "type" : "text"
+        },
+        "domain" : {
+          "type" : "text"
+        },
+        "site_name" : {
+          "type" : "text"
+        },
+        "status" : {
+          "type" : "text"
+        }
+      }
+    }
+  }
+}
