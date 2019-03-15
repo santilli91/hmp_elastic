@@ -166,8 +166,9 @@ class SearchPage extends ControllerBase {
 			);
 		if($query_terms !== '') {
 			$json_array['query']['function_score']['query']['bool']['must'][] = array(
-				'match' => array(
-					'terms' => $query_terms
+				'multi_match' => array(	
+					'query' => $query_terms,
+					'fields' => ['terms']
 				)
 			);
 		}

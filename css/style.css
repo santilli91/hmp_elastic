@@ -17,4 +17,9 @@
 .search-results .search-results-subhead {
 	font-size: 12px;
 	color: #afafaf;
+	text-transform: capitalize;
+}
+
+#elastic-filter-terms {
+	text-transform: capitalize;
 }
