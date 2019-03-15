@@ -22,7 +22,7 @@ class SearchPage extends ControllerBase {
 		$output .= "<form id='elastic-search-form'><input id='elastic-search-terms' type='text' name='search-terms'>";
 		if($terms[0] != '') {
 			$output .= "<select id='elastic-filter-terms'>";
-			$output .= '<option value="0">--Select--</option>';
+			$output .= '<option value="">--Select--</option>';
 			foreach($terms as $term) {
 				$option = explode('|',$term);
 				$output .= "<option value='" . $option[0] . "'>" . $option[1] . "</option>";
@@ -163,8 +163,7 @@ class SearchPage extends ControllerBase {
 					'operator' => 'and'
 				)
 			);
-
-		if($query_terms !== 0) {
+		if($query_terms !== '') {
 			$json_array['query']['function_score']['query']['bool']['must'][] = array(
 				'match' => array(
 					'terms' => $query_terms
