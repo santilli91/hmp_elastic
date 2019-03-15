@@ -150,7 +150,7 @@ class Index extends ControllerBase {
 				'domain' => $_SERVER['HTTP_HOST'],
 				'site_name' => $site_name,
 				'status' => $node->status->value,
-				'terms' => $terms
+				'terms' => $terms . ' ' . $node->getType(),
 			)
 		);
 

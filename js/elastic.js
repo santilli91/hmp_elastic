@@ -33,9 +33,9 @@ jQuery(function($) {
 
 	function performSearch() {
 		var query = $('#elastic-search-terms').val();
-		console.log(query);
+		var query_terms = $('#elastic-filter-terms').val();
 		$.ajax({
-			url: "/hmp-elastic/search/query?page=" + page + "&query=" + query,
+			url: "/hmp-elastic/search/query?page=" + page + "&query=" + query + "&query_terms=" + query_terms,
 		})
 		.done(function(results) {
 			$('#elastic-search-results').html(results);

@@ -55,6 +55,11 @@ class ConfigForm extends FormBase {
 			'#default_value' => $hmp_elastic['elastic_body'],
 			'#title' => 'ElasticSearch body field machine name (if nested in paragraph, separate with pipe: paragraph|field) ',
 		);
+		$form['elastic_filters'] = array(
+			'#type' => 'textarea',
+			'#default_value' => $hmp_elastic['elastic_filters'],
+			'#title' => "Filter Options used for filter dropdown.  Formatted in value|display (comma separated)"
+		);
 
 		/** Submit Button **/
 		$form['break'] = array(
@@ -82,7 +87,8 @@ class ConfigForm extends FormBase {
 			'elastic_content_type'				=>	$form_state->getValue('elastic_content_type'),
 			'elastic_term'				=>	$form_state->getValue('elastic_term'),
 			'elastic_node'				=>	$form_state->getValue('elastic_node'),
-			'elastic_body'				=>	$form_state->getValue('elastic_body')
+			'elastic_body'				=>	$form_state->getValue('elastic_body'),
+			'elastic_filters'			=> $form_state->getValue('elastic_filters')
 		);
 		\Drupal::state()->set('hmp_elastic',$hmp_elastic);
 	}

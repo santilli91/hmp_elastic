@@ -16,9 +16,21 @@ class SearchPage extends ControllerBase {
 	 **/
 	public function searchPage() {
 		\Drupal::service('page_cache_kill_switch')->trigger();
+		$hmp_elastic = \Drupal::state()->get('hmp_elastic');
+		$terms = explode(',',$hmp_elastic['elastic_filters']);
 		$output = '';
-		$output .= "<form id='elastic-search-form'><input id='elastic-search-terms' type='text' name='search-terms'>
-		<input type='button' name='submit' value='Search' id='elastic-search-submit'></form>";
+		$output .= "<form id='elastic-search-form'><input id='elastic-search-terms' type='text' name='search-terms'>";
+		if($terms[0] != '') {
+			$output .= "<select id='elastic-filter-terms'>";
+			$output .= '<option value="0">--Select--</option>';
+			foreach($terms as $term) {
+				$option = explode('|',$term);
+				$output .= "<option value='" . $option[0] . "'>" . $option[1] . "</option>";
+			}
+			$output .= "</select>";
+		}
+		$output .= "<input type='button' name='submit' value='Search' id='elastic-search-submit'>";
+		$output .="</form>";
 		return array(
 			'#type' => 'markup',
 			'#markup' => t("<h1>Search Page</h1>$output<div id='elastic-search-results'></div>"),
@@ -28,7 +40,8 @@ class SearchPage extends ControllerBase {
 	public function searchResults() {
 		$page = $_GET['page'];
 		$query = $_GET['query'];
-		$results = $this->grabContent($page,$query);
+		$query_terms = $_GET['query_terms'];
+		$results = $this->grabContent($page,$query,$query_terms);
 		$output = $this->formatContent($results,$page);
 		echo $output;exit;
 	}
@@ -66,7 +79,7 @@ class SearchPage extends ControllerBase {
 		/*
 	 * Index the content to Elasticsearch
 	 */
-	public function grabContent($page,$query) {
+	public function grabContent($page,$query,$query_terms) {
 		$hmp_elastic = \Drupal::state()->get('hmp_elastic');
 		$url = $hmp_elastic['elastic_server'];
 		$username = $hmp_elastic['elastic_username'];
@@ -75,7 +88,7 @@ class SearchPage extends ControllerBase {
 		$index = $hmp_elastic['elastic_index'];
 		$doc_type = 'default';
 		$port = 443;
-		$json_doc = json_encode(array(
+		$json_array = array(
 			'from' => $page,
 			'size' => 15,
 			'query' => array(
@@ -83,29 +96,29 @@ class SearchPage extends ControllerBase {
 					'query' => array(
 						'bool' => array(
 							'must' => array(
-								array(
+								/*array(
 									'multi_match' => array(	
 										'query' => $query,
 										'fields' => ['title','body','terms'],
 										'operator' => 'and'
 									)
-								),
+								),*/
 								array(
 									'match' => array(
 										'status' => '1'
 									)
 								)
-							),
-							'should' => array(
+							)
+							/*'should' => array(
 								array(
 									'match' => array(
 										'terms' => array(
 											'query' => 'article',
-											'boost' => 5
+											'boost' => 1
 										)
 									)
 								)
-							)
+							)*/
 						)
 					),
 					'functions' => array(
@@ -141,7 +154,24 @@ class SearchPage extends ControllerBase {
 						)
 				))
 			)
-		));
+		);
+		if($query != '') 
+			$json_array['query']['function_score']['query']['bool']['must'][] = array(
+				'multi_match' => array(	
+					'query' => $query,
+					'fields' => ['title','body','terms'],
+					'operator' => 'and'
+				)
+			);
+
+		if($query_terms !== 0) {
+			$json_array['query']['function_score']['query']['bool']['must'][] = array(
+				'match' => array(
+					'terms' => $query_terms
+				)
+			);
+		}
+		$json_doc = json_encode($json_array);
 
 	//	echo $json_doc;exit;
 	    $baseUri = $url.'/'.$index.'/'.$doc_type.'/_search';
