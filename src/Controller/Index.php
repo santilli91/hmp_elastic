@@ -92,6 +92,25 @@ class Index extends ControllerBase {
 				}
 			}
 		}
+		
+		/** Iterate through subhead fields, if found, use it and break the loop **/
+		$fields = explode(',',$hmp_elastic['elastic_subhead']);
+		$subhead = '';
+		foreach($fields as $field) {
+			if($field != '' && $node->hasField("$field")) {
+				$items = $node->get("$field")->getValue();
+				foreach($items as $item) {
+					$term = Term::load($item['target_id']);
+					if($term) {
+						$subhead = $term->getName();
+						break;
+					}
+				}
+				if($subhead != '')
+					break;
+			}
+		}
+		$subhead = $subhead == ''?$node->getType():$subhead;
 
 		/** Iterate through fields based on machine name for the body content, should be text fields only **/
 		$fields = explode(',',$hmp_elastic['elastic_body']);
@@ -151,6 +170,7 @@ class Index extends ControllerBase {
 				'site_name' => $site_name,
 				'status' => $node->status->value,
 				'terms' => $terms . ' ' . $node->getType(),
+				'subhead' => $subhead
 			)
 		);
 

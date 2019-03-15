@@ -1,19 +1,20 @@
-.seach-results {
+.search-results {
 	list-style: none;
 	margin: 12px;
 	border-bottom: 1px solid #afafaf;
 	padding-bottom: 12px;
 }
-.seach-results a {border: none;}
-.seach-results a:hover {text-decoration: none;border:none;}
-.seach-results .search-results-title a{
+.search-results a {border: none;}
+.search-results a:hover {text-decoration: none;border:none;}
+.search-results .search-results-title a{
 	font-size: 16px;
 	font-weight: bold;
 	color: #000;
 	text-decoration: none;
 }
 
-.seach-results .search-results-site a{
-	font-size: 11px;
+.search-results .search-results-site a,
+.search-results .search-results-subhead {
+	font-size: 12px;
 	color: #afafaf;
 }

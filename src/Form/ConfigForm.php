@@ -60,6 +60,11 @@ class ConfigForm extends FormBase {
 			'#default_value' => $hmp_elastic['elastic_filters'],
 			'#title' => "Filter Options used for filter dropdown.  Formatted in value|display (comma separated)"
 		);
+		$form['elastic_subhead'] = array(
+			'#type' => 'textarea',
+			'#default_value' => $hmp_elastic['elastic_subhead'],
+			'#title' => "Comma separated list of fields that should be the content's subhead.  Will parse in order, grabing the first available term.  If nothing present, will default to the items content type"
+		);
 
 		/** Submit Button **/
 		$form['break'] = array(
@@ -88,7 +93,8 @@ class ConfigForm extends FormBase {
 			'elastic_term'				=>	$form_state->getValue('elastic_term'),
 			'elastic_node'				=>	$form_state->getValue('elastic_node'),
 			'elastic_body'				=>	$form_state->getValue('elastic_body'),
-			'elastic_filters'			=> $form_state->getValue('elastic_filters')
+			'elastic_filters'			=> $form_state->getValue('elastic_filters'),
+			'elastic_subhead'			=> $form_state->getValue('elastic_subhead')
 		);
 		\Drupal::state()->set('hmp_elastic',$hmp_elastic);
 	}
