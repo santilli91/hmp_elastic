@@ -24,16 +24,19 @@ jQuery(function($) {
 	$(document).on('click','#elastic-pager-previous',function() {
 		page--;
 		performSearch();
+		$(document).scrollTop( $("#elastic-search-form").offset().top - 165 );
 	});
 	$(document).on('click','#elastic-pager-next',function() {
 		page++;
 		performSearch();
+		$(document).scrollTop( $("#elastic-search-form").offset().top - 165 );
 	});
 
 
 	function performSearch() {
 		var query = $('#elastic-search-terms').val();
 		var query_terms = $('#elastic-filter-terms').val();
+		$('#elastic-search-results').html('<img src="https://s3.amazonaws.com/HMP/loading.gif">');
 		$.ajax({
 			url: "/hmp-elastic/search/query?page=" + page + "&query=" + query + "&query_terms=" + query_terms,
 		})

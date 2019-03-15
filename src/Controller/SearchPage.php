@@ -19,17 +19,17 @@ class SearchPage extends ControllerBase {
 		$hmp_elastic = \Drupal::state()->get('hmp_elastic');
 		$terms = explode(',',$hmp_elastic['elastic_filters']);
 		$output = '';
-		$output .= "<form id='elastic-search-form'><input id='elastic-search-terms' type='text' name='search-terms'>";
+		$output .= "<form id='elastic-search-form'><div id='elastic-searh-input'><input placeholder='Search' id='elastic-search-terms' type='text' name='search-terms'>";
 		if($terms[0] != '') {
 			$output .= "<select id='elastic-filter-terms'>";
-			$output .= '<option value="">--Select--</option>';
+			$output .= '<option value="">--Select Filter--</option>';
 			foreach($terms as $term) {
 				$option = explode('|',$term);
 				$output .= "<option value='" . $option[0] . "'>" . $option[1] . "</option>";
 			}
 			$output .= "</select>";
 		}
-		$output .= "<input type='button' name='submit' value='Search' id='elastic-search-submit'>";
+		$output .= "</div><input type='button' name='submit' value='Search' id='elastic-search-submit'>";
 		$output .="</form>";
 		return array(
 			'#type' => 'markup',
