@@ -54,7 +54,7 @@ class SearchPage extends ControllerBase {
 		$content = "<div id='elastic-results'><ul id='search-results'>";
 		$count = $page * 15;
 		foreach($items as $item) {
-			$content .= '<li class="row seach-results">';
+			$content .= '<li class="seach-results">';
 			$content .= '<div class="search-results-title"><a target="_blank" href="' . $item->_source->url . '">' . $item->_source->title . '</a></div>';
 			$content .= '<div class="search-results-site"><a target="_blank" href="http://' . $item->_source->domain . '">' . $item->_source->site_name . '</a></div>';
 			$content .= '<div class="search-results-summary">' . $item->_source->summary . '</div>';
