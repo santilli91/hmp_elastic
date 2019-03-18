@@ -52,11 +52,11 @@ class SearchPage extends ControllerBase {
 	public function formatContent($data,$page) {
 		$items = $data->hits;
 		$content = "<div id='elastic-results'><ul id='search-results'>";
-		$count = $page * 15;
+		$count = $page * 10;
 		foreach($items as $item) {
 			$content .= '<li class="search-results">';
-			$content .= '<div class="search-results-subhead">' . $item->_source->subhead . '</div>';
-			$content .= '<div class="search-results-title"><a target="_blank" href="http://' . $item->_source->url . '">' . $item->_source->title . '</a></div>';
+			$content .= '<div class="search-results-subhead">' . $item->_source->subhead . ' | ' . date('m/d/Y',strtotime($item->_source->created)) . '</div>';
+			$content .= '<div class="search-results-title"><a target="_blank" href="' . $item->_source->url . '">' . $item->_source->title . '</a></div>';
 			$content .= '<div class="search-results-site"><a target="_blank" href="http://' . $item->_source->domain . '">' . $item->_source->site_name . '</a></div>';
 			$content .= '<div class="search-results-summary">' . $item->_source->summary . '</div>';
 			$content .= '</li>';
@@ -91,7 +91,7 @@ class SearchPage extends ControllerBase {
 		$port = 443;
 		$json_array = array(
 			'from' => $page,
-			'size' => 15,
+			'size' => 10,
 			'query' => array(
 				'function_score' => array(
 					'query' => array(
@@ -127,31 +127,31 @@ class SearchPage extends ControllerBase {
 							'filter' => array(
 								'range' => array(
 									'created' => array(
-										'gte' => 'now-4y',
+										'gte' => 'now-1y',
 										'lte' => 'now'
 									)
 								)
-							),'weight' => 15
+							),'weight' => 5
 						),
 						array(
 							'filter' => array(
 								'range' => array(
 									'created' => array(
-										'gte' => 'now-5y',
-										'lte' => 'now-4y'
+										'gte' => 'now-2y',
+										'lte' => 'now-1y'
 									)
 								)
-							),'weight' => 14
+							),'weight' => 4
 						),
 						array(
 							'filter' => array(
 								'range' => array(
 									'created' => array(
-										'gte' => 'now-7y',
-										'lte' => 'now-5y'
+										'gte' => 'now-4y',
+										'lte' => 'now-2y'
 									)
 								)
-							),'weight' => 7
+							),'weight' => 3
 						)
 				))
 			)
