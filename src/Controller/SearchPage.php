@@ -90,7 +90,7 @@ class SearchPage extends ControllerBase {
 		$doc_type = 'default';
 		$port = 443;
 		$json_array = array(
-			'from' => $page,
+			'from' => $page*10,
 			'size' => 10,
 			'query' => array(
 				'function_score' => array(
